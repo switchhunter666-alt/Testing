@@ -86,7 +86,8 @@ public final class MainActivity extends Activity {
         composer.setHint("Write a message to transform...");
         composer.setMinLines(3);
         composer.setGravity(Gravity.TOP);
-        composer.setText("Hello from Nexus!");
+        String shared = getIntent() != null && Intent.ACTION_SEND.equals(getIntent().getAction()) && "text/plain".equals(getIntent().getType()) ? getIntent().getStringExtra(Intent.EXTRA_TEXT) : null;
+        composer.setText(shared != null ? shared : "Hello from Nexus!");
         box.addView(composer);
 
         addButton(box, "Plain", () -> { mode = 0; updatePreview(); });
@@ -112,12 +113,23 @@ public final class MainActivity extends Activity {
             send.putExtra(Intent.EXTRA_TEXT, transform(composer.getText().toString(), mode));
             startActivity(Intent.createChooser(send, "Share message"));
         });
+        addButton(root, "Open floating editor over Discord", () -> {
+            if (!android.provider.Settings.canDrawOverlays(this)) {
+                Intent permission = new Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    android.net.Uri.parse("package:" + getPackageName()));
+                startActivity(permission);
+                Toast.makeText(this, "Allow display over other apps, then return and tap again", Toast.LENGTH_LONG).show();
+                return;
+            }
+            startService(new Intent(this, FloatingComposerService.class));
+            Toast.makeText(this, "Floating editor enabled", Toast.LENGTH_SHORT).show();
+        });
         addButton(root, "Copy output", () -> {
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
             clipboard.setPrimaryClip(android.content.ClipData.newPlainText("Nexus output", transform(composer.getText().toString(), mode)));
             Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show();
         });
-        root.addView(text("This build transforms outgoing text locally. Direct Discord API posting requires OAuth2 or a separately hosted authorized bot. No user tokens are collected.", 12, Color.rgb(170, 180, 205)));
+        root.addView(text("Share text into NEXUS from Android, or use the floating composer while Discord is open. Paste or share transformed text into Discord. No user tokens are collected.", 12, Color.rgb(170, 180, 205)));
         setContentView(scroll);
     }
 }
