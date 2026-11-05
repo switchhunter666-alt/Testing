@@ -40,9 +40,30 @@ jobs:
           gradle-version: '8.11.1'
       - name: Build debug APK
         run: gradle --no-daemon :app:assembleDebug
-      - name: Upload installable APK
+      - name: Verify package, signature, and arm64 native library
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+          TOOLS=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          echo "Build tools: $TOOLS"
+          test -f "$APK"
+          "$TOOLS/apksigner" verify --verbose --print-certs "$APK" | tee app/build/outputs/apk/debug/signature-report.txt
+          "$TOOLS/zipalign" -c -v 4 "$APK"
+          "$TOOLS/aapt" dump badging "$APK" | tee app/build/outputs/apk/debug/package-report.txt
+          grep -q "package: name='dev.nexus.omega'" app/build/outputs/apk/debug/package-report.txt
+          unzip -Z -1 "$APK" | grep -q '^lib/arm64-v8a/libdiscord_native.so
+          ( cd app/build/outputs/apk/debug && sha256sum app-debug.apk > SHA256SUMS )
+          echo "APK verified. This is a DEBUG build signed by the current CI runner."
+          echo "Its signing certificate may change on later runs. Uninstall earlier"
+          echo "versions before installing a build with a different signature."
+      - name: Upload verified APK and integrity details
         uses: actions/upload-artifact@v4
         with:
-          name: discord-native-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          name: nexus-omega-android-apk
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/debug/signature-report.txt
+            app/build/outputs/apk/debug/package-report.txt
+            app/build/outputs/apk/debug/SHA256SUMS
           if-no-files-found: error
