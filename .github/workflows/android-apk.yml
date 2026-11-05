@@ -49,11 +49,20 @@ jobs:
           echo "Build tools: $TOOLS"
           test -f "$APK"
           "$TOOLS/apksigner" verify --verbose --print-certs "$APK" | tee app/build/outputs/apk/debug/signature-report.txt
-          "$TOOLS/zipalign" -c -v 4 "$APK"
+          "$TOOLS/zipalign" -P 16 -c -v 4 "$APK"
           "$TOOLS/aapt" dump badging "$APK" | tee app/build/outputs/apk/debug/package-report.txt
           grep -q "package: name='dev.nexus.omega'" app/build/outputs/apk/debug/package-report.txt
           unzip -Z -1 "$APK" > app/build/outputs/apk/debug/apk-contents.txt
           grep -Fx "lib/arm64-v8a/libdiscord_native.so" app/build/outputs/apk/debug/apk-contents.txt
+          TMP_NATIVE=$(mktemp)
+          trap 'rm -f "$TMP_NATIVE"' EXIT
+          unzip -p "$APK" lib/arm64-v8a/libdiscord_native.so > "$TMP_NATIVE"
+          readelf -W -l "$TMP_NATIVE" | tee app/build/outputs/apk/debug/elf-align-report.txt
+          if ! awk '$1 == "LOAD" && $NF != "0x4000" { bad=1; print "Incompatible native alignment:", $0 } END { exit bad }' app/build/outputs/apk/debug/elf-align-report.txt; then
+            echo "::error::Native library still has 4 KiB PT_LOAD alignment; requires 16 KiB."
+            exit 1
+          fi
+          echo "Verified 16 KiB native PT_LOAD alignment."
           ( cd app/build/outputs/apk/debug && sha256sum app-debug.apk > SHA256SUMS )
           echo "APK verified. This is a DEBUG build signed by the current CI runner."
           echo "Its signing certificate may change on later runs. Uninstall earlier"
@@ -65,6 +74,6 @@ jobs:
           path: |
             app/build/outputs/apk/debug/app-debug.apk
             app/build/outputs/apk/debug/signature-report.txt
-            app/build/outputs/apk/debug/package-report.txt
+            app/build/outputs/apk/debug/package-report.txt\n            app/build/outputs/apk/debug/elf-align-report.txt
             app/build/outputs/apk/debug/SHA256SUMS
           if-no-files-found: error

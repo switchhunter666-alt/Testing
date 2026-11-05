@@ -62,3 +62,19 @@ GitHub Actions secrets, and sign every release with the same keystore.
 
 This is a companion app, not a replacement for Discord or a patched official
 Discord APK. Installing it does not automatically install the Valenced plugin.
+
+## v0.3.0: 16 KiB native page alignment fix
+
+Inspection of the old `v0.2.0` APK confirmed that the bundled arm64 library
+had ELF `PT_LOAD` alignment `0x1000` (4 KiB) even though its ZIP offset
+was 16 KiB aligned. Newer Android devices can require 16 KiB ELF alignment.
+The NDK r27 CMake build now explicitly links with both 16 KiB page flags.
+The CI workflow uses `zipalign -P 16 -c` and rejects any arm64 `PT_LOAD`
+entry that does not have `0x4000` alignment. The resulting ZIP includes
+`elf-align-report.txt`.
+
+This is a verified binary compatibility defect and a possible explanation
+for installation failure. It is not conclusive evidence of the exact cause
+on a phone until we know the device page size or the installer error code.
+
+Reference: https://developer.android.com/guide/practices/page-sizes

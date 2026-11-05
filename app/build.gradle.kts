@@ -8,8 +8,8 @@ android {
         applicationId = "dev.nexus.omega"
         minSdk = 26
         targetSdk = (System.getenv("ANDROID_COMPILE_API") ?: "35").toInt()
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 3
+        versionName = "0.3.0"
         externalNativeBuild { cmake { cppFlags += listOf("-std=c++2c", "-Wall", "-Wextra") } }
     }
     externalNativeBuild { cmake { path = file("src/main/cpp/CMakeLists.txt") } }
