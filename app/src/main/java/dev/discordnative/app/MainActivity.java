@@ -107,6 +107,27 @@ public final class MainActivity extends Activity {
         box.addView(preview);
         updatePreview();
 
+        root.addView(text("OMEGA // CREATIVE STUDIO", 20, Color.WHITE));
+        addButton(root, "MediaForge • Render and share image card", () -> {
+            try {
+                MediaForge.shareCard(this, transform(composer.getText().toString(), mode));
+            } catch (Exception e) {
+                Toast.makeText(this, "Image export failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+        root.addView(text("PRIVATE WORKSPACE", 18, Color.WHITE));
+        addButton(root, "Save local draft", () -> {
+            new LocalVault(this).save(composer.getText().toString());
+            Toast.makeText(this, "Draft saved locally", Toast.LENGTH_SHORT).show();
+        });
+        addButton(root, "Restore local draft", () -> {
+            composer.setText(new LocalVault(this).load());
+            updatePreview();
+        });
+        addButton(root, "Delete saved draft", () -> {
+            new LocalVault(this).clear();
+            Toast.makeText(this, "Saved draft deleted", Toast.LENGTH_SHORT).show();
+        });
         addButton(root, "Share transformed message", () -> {
             Intent send = new Intent(Intent.ACTION_SEND);
             send.setType("text/plain");
