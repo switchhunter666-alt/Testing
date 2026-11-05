@@ -18,7 +18,7 @@ import android.widget.Toast;
 public final class MainActivity extends Activity {
     static { System.loadLibrary("discord_native"); }
     private static native String nativeStatus();
-    private static native String transform(String input, int mode);
+    static native String transform(String input, int mode);
 
     private final int background = Color.rgb(13, 16, 26);
     private final int panel = Color.rgb(27, 32, 49);
