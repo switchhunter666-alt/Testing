@@ -9,24 +9,23 @@ Android companion APK in the repository root.
   Android client.
 - Previews nine message transformations, including Markdown, spoiler, code
   fences, fullwidth Unicode, a checklist and a NEXUS frame.
-- Copies the selected output to the clipboard so it can be pasted into
-  Discord conversations. Other users see the **supported message content**,
-  not the plugin UI.
-- Works offline with no user tokens, no injected network requests and
-  no background account automation.
+- Copies selected output to the clipboard for pasting into Discord.
+- Generates a share URL for the optional **NEXUS Share Cards Worker**.
+  Once that HTTPS worker is deployed, ordinary Discord users may see a
+  native card preview from the URL (no modified client needed).
+- Works without account tokens, injected network requests or background
+  automation.
 
 ## GitHub Actions build
 
-Open **Actions → Build NEXUS Valenced plugin**. The workflow runs Bun-based
-unit tests, a TypeScript check and Valenced's published plugin CLI build, then
-packages `manifest.json` and `index.js` into:
+Open **Actions → Build NEXUS Valenced plugin**. The workflow runs Bun tests,
+TypeScript checks and the Valenced plugin CLI build, then packages
+`manifest.json` and `index.js` as:
 
 `dev.nexus.unleashed@0.1.0.zip`
 
-Download the **nexus-unleashed-valenced-plugin** artifact from a successful
-workflow run. Install through a compatible Valenced plugin manager.
-Before installing, back up your data and confirm compatibility with the
-Discord/Valenced version on your device.
+Download **nexus-unleashed-valenced-plugin** from a successful workflow run.
+Install with a compatible Valenced manager.
 
 ## Local development
 
@@ -38,6 +37,8 @@ bun run check
 bun run build nexus-unleashed
 ```
 
-The companion APK is produced independently by **Build Android APK** and can
-share files/text via Android's standard share sheet. This plugin does not
-replace Discord, grant server permissions, or deploy the Discord Activity.
+See [Share Cards](../edge/share-cards/README.md) for its optional HTTPS
+deployment. Share links encode their content directly into the URL.
+
+The companion APK is built independently by **Build Android APK**.
+This plugin does not replace Discord or grant server permissions.

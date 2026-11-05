@@ -1,0 +1,4 @@
+name = "nexus-share-cards"
+main = "src/index.js"
+compatibility_date = "2026-11-05"
+workers_dev = true

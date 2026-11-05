@@ -1,28 +1,32 @@
 # NEXUS OMEGA — Discord Android research lab
 
-This repository contains three independent experiments:
+The project now contains four independent experiments:
 
-1. **Android 17 companion APK** in `app/`: native C++ message transforms,
-   Android overlay composer, local draft vault and media card export.
-2. **Reality Room Activity** in `activity/`: a standalone interactive web
-   prototype using Discord's Embedded App SDK. Hosting and Discord developer
-   configuration are required before it can run in the official app.
-3. **NEXUS Unleashed Valenced plugin** in `valenced/`: an in-client message
-   studio for a compatible modified Android Discord app.
+1. **Android 17-compatible companion APK** in `app/`: native C++ message
+   transforms, overlay composer, local draft vault and image card export.
+2. **Reality Room Activity** in `activity/`: interactive web prototype using
+   Discord's Embedded App SDK. Hosting and configuration are required.
+3. **NEXUS Unleashed Valenced plugin** in `valenced/`: in-client message
+   studio for a compatible modified Discord Android app.
+4. **NEXUS Share Cards Worker** in `edge/share-cards/`: an optional stateless
+   HTTPS service for rich link previews visible to standard Discord clients.
 
-## Build on GitHub
+## GitHub builds
 
-Open the [Actions tab](https://github.com/switchhunter666-alt/Testing/actions)
-to get installable build artifacts:
+- [Build Android APK](https://github.com/switchhunter666-alt/Testing/actions/workflows/android-apk.yml)
+  produces `discord-native-debug-apk`.
+- [Reality Room web build](https://github.com/switchhunter666-alt/Testing/actions/workflows/activity-check.yml)
+  checks the Activity frontend.
+- [Build NEXUS Valenced plugin](https://github.com/switchhunter666-alt/Testing/actions/workflows/valenced-plugin.yml)
+  produces an installable plugin ZIP.
+- [Verify NEXUS Share Cards](https://github.com/switchhunter666-alt/Testing/actions/workflows/share-cards-check.yml)
+  tests and packages the optional Cloudflare Worker source.
 
-- **Build Android APK** produces `discord-native-debug-apk`.
-- **Reality Room web build** checks the embedded Activity frontend.
-- **Build NEXUS Valenced plugin** produces `nexus-unleashed-valenced-plugin`,
-  containing `dev.nexus.unleashed@0.1.0.zip`.
+The Valenced ZIP is **not** an APK. The companion APK is **not** a patched
+Discord app. The Share Cards Worker must be independently deployed on a public
+HTTPS host before its links produce Discord embeds. No part of this system
+overrides Discord permissions or reads unconsenting users' private data.
 
-The Valenced ZIP is **not** an APK, and the companion APK is **not** a
-patched Discord client. Neither component grants administrator privileges
-or unconsented access to other accounts.
-
-See [Valenced plugin instructions](valenced/README.md) and
-[architecture and limitations](docs/OMEGA-ARCHITECTURE.md).
+See [Valenced plugin instructions](valenced/README.md),
+[Share Cards deployment](edge/share-cards/README.md), and
+[architecture](docs/OMEGA-ARCHITECTURE.md).

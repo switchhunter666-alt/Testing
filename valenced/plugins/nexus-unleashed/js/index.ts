@@ -7,13 +7,14 @@
  */
 import { React, ReactNative } from '@valenced/react';
 import { Clipboard } from '@valenced/externals/react-native-clipboard';
-import { formatMessage, MODES } from './formats';
+import { buildCardLink, formatMessage, MODES } from './formats';
 import type { Mode } from './formats';
 
 function SettingsComponent() {
   const [draft, setDraft] = React.useState('Hello from NEXUS Unleashed!');
   const [mode, setMode] = React.useState<Mode>('NEXUS Frame');
   const [feedback, setFeedback] = React.useState('Ready');
+  const [cardHost, setCardHost] = React.useState('');
   const { ScrollView, View, Text, TextInput, Pressable } = ReactNative;
   const e = React.createElement;
   const preview = formatMessage(draft, mode);
@@ -70,6 +71,26 @@ function SettingsComponent() {
       }, true),
       button('CLEAR', () => { setDraft(''); setFeedback('Cleared'); }),
     ),
+    e(Text, {style: {color: '#ffffff', fontWeight: '700', marginTop: 20, marginBottom: 8}}, 'SHARE AS DISCORD CARD'),
+    e(Text, {style: {color: '#aeb8d5', marginBottom: 8}},
+      'Deploy the optional Share Cards worker, then enter its HTTPS URL. Card links can be previewed by ordinary Discord clients.'),
+    e(TextInput, {
+      value: cardHost, onChangeText: setCardHost,
+      autoCapitalize: 'none', autoCorrect: false,
+      placeholder: 'https://your-worker.workers.dev',
+      placeholderTextColor: '#9fa4bf',
+      style: {backgroundColor: '#242940', color: 'white', borderRadius: 12,
+        padding: 12, marginBottom: 11},
+    }),
+    button('COPY LIVE CARD LINK', () => {
+      try {
+        const link = buildCardLink(cardHost, preview);
+        Clipboard.setString(link);
+        setFeedback('Card link copied! Paste into Discord to test its preview.');
+      } catch (error) {
+        setFeedback(error instanceof Error ? error.message : 'Cannot make card link.');
+      }
+    }),
     e(Text, {accessibilityLiveRegion: 'polite', style: {color: '#b0a8ff', marginTop: 6}}, feedback),
     e(Text, {style: {color: '#8d95b9', marginTop: 19, fontSize: 12}},
       'Only supported Discord formatting is visible to other users. No background account automation.'),

@@ -46,3 +46,14 @@ export function formatMessage(raw: string, mode: Mode): string {
       return value;
   }
 }
+
+/** Creates a shareable URL for an independently hosted NEXUS card worker. */
+export function buildCardLink(host: string, message: string): string {
+  const base = host.trim().replace(/\/+$/g, '');
+  if (!/^https:\/\/[a-z0-9][a-z0-9.-]*(?::[0-9]+)?$/i.test(base)) {
+    throw new Error('Enter a valid HTTPS worker origin, without a path.');
+  }
+  const content = Array.from(message).slice(0, 300).join('');
+  if (!content.trim()) throw new Error('Write a message first.');
+  return base + '/p/' + encodeURIComponent(content);
+}
