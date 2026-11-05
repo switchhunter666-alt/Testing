@@ -1,0 +1,30 @@
+name: Download Android SDK Command-line Tools
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/fetch-android-sdk.yml
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-sdk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Fetch official Google Android SDK command-line tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --output commandlinetools-linux-15859902_latest.zip             https://dl.google.com/android/repository/commandlinetools-linux-15859902_latest.zip
+          echo "4e4c464f145a7512b57d088ac6c278c03c9eea610886b35a5e0804e74eedf583  commandlinetools-linux-15859902_latest.zip" | sha256sum --check
+      - name: Store verified Android SDK download
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-sdk-commandline-tools-linux
+          path: commandlinetools-linux-15859902_latest.zip
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
