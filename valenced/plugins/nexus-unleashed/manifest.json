@@ -1,0 +1,13 @@
+{
+  "format": 1,
+  "id": "dev.nexus.unleashed",
+  "name": "NEXUS Unleashed",
+  "description": "An in-Discord creative composer with reversible formatting, copy actions and experimental tools.",
+  "author": "NEXUS Lab",
+  "version": "0.1.0",
+  "dependencies": {
+    "valenced.api": {"version": ">=1 <2"},
+    "discord": {"version": "*"}
+  },
+  "dist": {"script": "index.js"}
+}

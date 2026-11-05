@@ -1,0 +1,63 @@
+name: Build NEXUS Valenced plugin
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'valenced/**'
+      - '.github/workflows/valenced-plugin.yml'
+  pull_request:
+    paths:
+      - 'valenced/**'
+      - '.github/workflows/valenced-plugin.yml'
+  workflow_dispatch:
+
+jobs:
+  plugin:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install Valenced toolchain
+        working-directory: valenced
+        run: bun install --no-save
+      - name: Test formatting engine
+        working-directory: valenced
+        run: bun test
+      - name: Typecheck plugin
+        working-directory: valenced
+        run: bun run check
+      - name: Build Valenced JavaScript plugin
+        working-directory: valenced
+        run: bun run build nexus-unleashed
+      - name: Package installable Valenced ZIP
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile, ZIP_DEFLATED
+          base = Path('valenced/plugins/nexus-unleashed')
+          script = base/'build/js/index.js'
+          manifest = base/'manifest.json'
+          assert script.is_file(), f'Missing JS bundle: {script}'
+          assert manifest.is_file(), f'Missing manifest: {manifest}'
+          out = Path('valenced/build/dist')
+          out.mkdir(parents=True, exist_ok=True)
+          archive = out/'dev.nexus.unleashed@0.1.0.zip'
+          with ZipFile(archive, 'w', ZIP_DEFLATED) as z:
+              z.write(manifest, 'manifest.json')
+              z.write(script, 'index.js')
+          with ZipFile(archive) as z:
+              assert set(z.namelist()) == {'manifest.json', 'index.js'}
+          print('Packaged:', archive)
+          PY
+      - name: Upload installable plugin artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-unleashed-valenced-plugin
+          path: valenced/build/dist/*.zip
+          if-no-files-found: error
