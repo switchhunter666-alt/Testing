@@ -21,8 +21,6 @@ public final class FloatingComposerService extends Service {
     private WindowManager manager;
     private LinearLayout panel;
     private WindowManager.LayoutParams params;
-    private static native String transform(String input, int mode);
-    static { System.loadLibrary("discord_native"); }
 
     @Override public IBinder onBind(Intent intent) { return null; }
     @Override public int onStartCommand(Intent intent, int flags, int startId) {
@@ -82,7 +80,7 @@ public final class FloatingComposerService extends Service {
         panel.addView(copy);
         copy.setOnClickListener(v -> {
             ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-            clipboard.setPrimaryClip(ClipData.newPlainText("NEXUS", transform(input.getText().toString(), mode[0])));
+            clipboard.setPrimaryClip(ClipData.newPlainText("NEXUS", MainActivity.transform(input.getText().toString(), mode[0])));
             android.widget.Toast.makeText(this, "Copied — paste into Discord", android.widget.Toast.LENGTH_SHORT).show();
         });
         Button close = new Button(this);
