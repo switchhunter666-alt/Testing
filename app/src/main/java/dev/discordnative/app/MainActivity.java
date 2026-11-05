@@ -94,6 +94,11 @@ public final class MainActivity extends Activity {
         addButton(box, "Quote Block", () -> { mode = 2; updatePreview(); });
         addButton(box, "Code Block", () -> { mode = 3; updatePreview(); });
         addButton(box, "Spoiler", () -> { mode = 4; updatePreview(); });
+        addButton(box, "FULLWIDTH // RealityText", () -> { mode = 5; updatePreview(); });
+        addButton(box, "GLITCH // Distortion", () -> { mode = 6; updatePreview(); });
+        addButton(box, "REVERSE // Mirror", () -> { mode = 7; updatePreview(); });
+        addButton(box, "FRAME // Message Card", () -> { mode = 8; updatePreview(); });
+        addButton(box, "NEXUS // Signature", () -> { mode = 9; updatePreview(); });
 
         box.addView(text("OUTPUT PREVIEW", 13, Color.rgb(175, 185, 220)));
         preview = text("", 16, Color.WHITE);
