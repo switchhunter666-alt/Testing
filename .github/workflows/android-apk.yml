@@ -52,7 +52,8 @@ jobs:
           "$TOOLS/zipalign" -c -v 4 "$APK"
           "$TOOLS/aapt" dump badging "$APK" | tee app/build/outputs/apk/debug/package-report.txt
           grep -q "package: name='dev.nexus.omega'" app/build/outputs/apk/debug/package-report.txt
-          unzip -Z -1 "$APK" | grep -q '^lib/arm64-v8a/libdiscord_native.so
+          unzip -Z -1 "$APK" > app/build/outputs/apk/debug/apk-contents.txt
+          grep -Fx "lib/arm64-v8a/libdiscord_native.so" app/build/outputs/apk/debug/apk-contents.txt
           ( cd app/build/outputs/apk/debug && sha256sum app-debug.apk > SHA256SUMS )
           echo "APK verified. This is a DEBUG build signed by the current CI runner."
           echo "Its signing certificate may change on later runs. Uninstall earlier"
