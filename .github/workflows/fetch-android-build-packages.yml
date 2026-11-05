@@ -1,0 +1,40 @@
+name: Fetch Android 17 SDK Build Packages
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/fetch-android-build-packages.yml
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-android-build-packages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Configure Android SDK on GitHub runner
+        uses: android-actions/setup-android@v3
+      - name: Download Android 17 platform and compatible build tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "SDK location: ${ANDROID_HOME}"
+          sdkmanager "platforms;android-37" "build-tools;36.0.0"
+          test -f "${ANDROID_HOME}/platforms/android-37/android.jar"
+          test -x "${ANDROID_HOME}/build-tools/36.0.0/aapt"
+          tar -czf android17-sdk-build-packages-linux.tar.gz \
+            -C "${ANDROID_HOME}" \
+            platforms/android-37 build-tools/36.0.0
+          sha256sum android17-sdk-build-packages-linux.tar.gz > SHA256SUMS.txt
+      - name: Upload portable SDK bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: android17-sdk-build-packages-linux
+          path: |
+            android17-sdk-build-packages-linux.tar.gz
+            SHA256SUMS.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
