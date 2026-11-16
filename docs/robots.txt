@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://switchhunter666-alt.github.io/Testing/sitemap.xml
